@@ -1,4 +1,4 @@
-FROM base/archlinux
+FROM library/debian:stretch-slim
 MAINTAINER Julian Xhokaxhiu <info at julianxhokaxhiu dot com>
 
 # Environment variables
@@ -93,76 +93,23 @@ WORKDIR $SRC_DIR
 
 RUN chmod 0755 /root/*
 
-# Enable multilib support
-#########################
+# Enable contrib support
+########################
 
-RUN sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
-
-# Install development tools
-##############################
-
-RUN pacman -Sy --needed --noconfirm --noprogressbar base-devel
-
-# Replace conflicting packages
-##############################
-
-RUN yes | pacman -Sy --noprogressbar --needed gcc-multilib
-
-# Install manually compiled packages
-####################################
-
-RUN pacman -U --noconfirm --noprogressbar /root/ncurses5-compat-libs-6.0+20161224-1-x86_64.pkg.tar.xz \
-    && rm /root/ncurses5-compat-libs-6.0+20161224-1-x86_64.pkg.tar.xz \
-    && pacman -U --noconfirm --noprogressbar /root/lib32-ncurses5-compat-libs-6.0-4-x86_64.pkg.tar.xz \
-    && rm /root/lib32-ncurses5-compat-libs-6.0-4-x86_64.pkg.tar.xz
+RUN sed -i "s/ main$/ main contrib/" /etc/apt/sources.list
 
 # Install required Android AOSP packages
 ########################################
 
-RUN pacman -Sy --needed --noconfirm --noprogressbar \
-      git \
-      gnupg \
-      flex \
-      bison \
-      gperf \
-      sdl \
-      wxgtk \
-      squashfs-tools \
-      curl \
-      ncurses \
-      zlib \
-      schedtool \
-      perl-switch \
-      zip \
-      unzip \
-      libxslt \
-      bc \
-      lib32-zlib \
-      lib32-ncurses \
-      lib32-readline \
-      rsync \
-      maven \
-      repo \
-      imagemagick \
-      ccache \
-      libxml2 \
-      cronie \
-      ninja \
-      wget \
-      jdk8-openjdk
-
-# Create missing symlink to python2
-###################################
-RUN ln -s /usr/bin/python2 /usr/local/bin/python
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev ccache libgl1-mesa-dev libxml2-utils xsltproc unzip \
+    repo \
+    ca-certificates \
+&& rm -rf /var/lib/apt/lists/*
 
 # Allow redirection of stdout to docker logs
 ############################################
 RUN ln -sf /proc/1/fd/1 /var/log/docker.log
-
-# Cleanup
-#########
-
-RUN yes | pacman -Scc
 
 # Set the entry point to init.sh
 ###########################################
