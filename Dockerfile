@@ -102,9 +102,10 @@ RUN sed -i "s/ main$/ main contrib/" /etc/apt/sources.list
 ########################################
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev ccache libgl1-mesa-dev libxml2-utils xsltproc unzip \
+    bc bison build-essential curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev libesd0-dev liblz4-tool libncurses5-dev libsdl1.2-dev libssl-dev libwxgtk3.0-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc yasm zip zlib1g-dev \
+    openjdk-8-jdk \
+    ccache \
     repo \
-    ca-certificates \
 && rm -rf /var/lib/apt/lists/*
 
 # Allow redirection of stdout to docker logs
